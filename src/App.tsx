@@ -351,34 +351,17 @@ const App: React.FC = () => {
             style={{ visibility: stock.length > 0 ? 'visible' : 'hidden', cursor: stock.length > 0 ? 'pointer' : 'default' }}>
             <div className="stock-card-front">
               <div className="stock-card-decor">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.9">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.9">
                   <rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7h18" /><circle cx="17" cy="13" r="1" fill="currentColor" />
                 </svg>
               </div>
-              <span className="stock-count">{stock.length > 0 ? Math.ceil(stock.length / 10) : ''}</span>
+              <div className="stock-info">
+                <span className="stock-text">{t.deal}</span>
+                <span className="stock-count">{stock.length > 0 ? Math.ceil(stock.length / 10) : ''}</span>
+              </div>
             </div>
             <div className="stock-card-back"></div>
           </motion.div>
-
-          <div className="controls-merged">
-            <button onClick={handleUndo} disabled={history.length === 0} title={t.undo}>
-              <RotateCcw size={16} />
-            </button>
-            <button onClick={handleHint} title={t.hint} style={{ background: 'rgba(255, 215, 0, 0.2)', color: '#ffd700' }}>
-              <HelpCircle size={16} />
-            </button>
-            <select value={difficulty} onChange={(e) => initGame(Number(e.target.value) as any)}>
-              <option value={1}>{t.difficulty1}</option>
-              <option value={2}>{t.difficulty2}</option>
-              <option value={4}>{t.difficulty4}</option>
-            </select>
-            <button onClick={toggleLang} title={t.langName}>
-              <Languages size={14} /> {t.langName}
-            </button>
-            <button onClick={handleNewGame} title={t.newGame} style={{ background: 'linear-gradient(135deg, #e94560, #c73e54)', color: '#fff' }}>
-              <RefreshCcw size={14} />
-            </button>
-          </div>
         </div>
         
         <div className="header-deck-area">
@@ -387,14 +370,42 @@ const App: React.FC = () => {
               <div key={i} className="completed-slot-top">
                 {completedPiles[i]?.map((card) => (
                   <motion.div key={card.id} layoutId={card.id} className="card-face-mini"
-                    style={{ background: 'linear-gradient(135deg, #667eea, #764ba2)', color: '#fff', fontSize: '0.65rem', fontWeight: 'bold' }}>
-                    {card.rank === 13 ? 'K' : ''}
+                    style={{ 
+                      background: '#fff', 
+                      color: (card.suit === 'hearts' || card.suit === 'diamonds') ? '#e94560' : '#333',
+                      fontSize: '0.7rem', 
+                      fontWeight: '800'
+                    }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '0px', transform: 'scale(0.9)' }}>
+                      <span>K</span>
+                      <span style={{ fontSize: '0.6rem', marginTop: '-2px' }}>{SUIT_ICONS[card.suit]}</span>
+                    </div>
                   </motion.div>
                 ))}
                 {!completedPiles[i] && <div className="empty-slot-placeholder"><span>✓</span></div>}
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="controls-merged">
+          <button onClick={handleUndo} disabled={history.length === 0} title={t.undo}>
+            <RotateCcw size={16} />
+          </button>
+          <button onClick={handleHint} title={t.hint} style={{ background: 'rgba(255, 215, 0, 0.2)', color: '#ffd700' }}>
+            <HelpCircle size={16} />
+          </button>
+          <select value={difficulty} onChange={(e) => initGame(Number(e.target.value) as any)}>
+            <option value={1}>{t.difficulty1}</option>
+            <option value={2}>{t.difficulty2}</option>
+            <option value={4}>{t.difficulty4}</option>
+          </select>
+          <button onClick={toggleLang} title={t.langName}>
+            <Languages size={14} /> {t.langName}
+          </button>
+          <button onClick={handleNewGame} title={t.newGame} style={{ background: 'linear-gradient(135deg, #e94560, #c73e54)', color: '#fff' }}>
+            <RefreshCcw size={14} />
+          </button>
         </div>
       </header>
 
