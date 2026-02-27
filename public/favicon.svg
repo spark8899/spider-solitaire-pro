@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background Card Shape -->
+  <rect x="32" y="32" width="448" height="448" rx="64" fill="#2D5A27" />
+  
+  <!-- Spider Web Pattern -->
+  <g stroke="#ffffff" stroke-width="8" stroke-opacity="0.3" fill="none">
+    <path d="M256 256 L512 0 M256 256 L512 512 M256 256 L0 512 M256 256 L0 0" />
+    <path d="M256 256 L256 0 M256 256 L512 256 M256 256 L256 512 M256 256 L0 256" />
+    <path d="M256 128 Q384 128 384 256 Q384 384 256 384 Q128 384 128 256 Q128 128 256 128" />
+    <path d="M256 64 Q448 64 448 256 Q448 448 256 448 Q64 448 64 256 Q64 64 256 64" />
+  </g>
+
+  <!-- Central Spade Icon -->
+  <path d="M256 140 C210 140 180 200 180 240 C180 280 210 320 256 320 C302 320 332 280 332 240 C332 200 302 140 256 140 Z M256 320 L230 380 L282 380 Z" fill="#ffffff" />
+</svg>
