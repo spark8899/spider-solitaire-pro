@@ -1,51 +1,24 @@
 :root {
-  /* Modern vibrant palette */
   --felt-green: #1a1a2e;
   --felt-dark: #16213e;
   --felt-accent: #0f3460;
   --accent-gold: #e94560;
   --accent-cyan: #00d9ff;
   --accent-purple: #7b2cbf;
-  
-  /* Responsive base sizes */
   --card-width: 100px;
   --card-height: 145px;
   --card-overlap: 30px;
   --card-radius: 8px;
-  
   --card-shadow: 0 8px 25px rgba(0,0,0,0.4);
 }
 
-/* Mobile Adjustments */
 @media (max-width: 768px) {
   :root {
-    --card-width: 9vw; /* Fit 10 columns in viewport */
+    --card-width: 9vw;
     --card-height: 13vw;
-    --card-overlap: 4.5vw; /* Tighter overlap on mobile */
+    --card-overlap: 4.5vw;
     --card-radius: 4px;
   }
-  
-  .game-container { padding: 10px 5px !important; }
-  header { padding: 5px 10px !important; margin-bottom: 10px !important; gap: 5px; }
-  .logo h1 { font-size: 0.9rem !important; }
-  .stats-container { gap: 10px !important; }
-  .stat-label { font-size: 0.6rem !important; }
-  .stat-value { font-size: 0.9rem !important; }
-  .controls { gap: 5px !important; }
-  .controls button, .controls select { padding: 4px 6px !important; font-size: 0.7rem !important; }
-  .controls-group { gap: 3px !important; }
-  
-  .rank-text { font-size: 0.75rem !important; line-height: 0.9 !important; }
-  .suit-mini { font-size: 0.5rem !important; margin-top: -1px !important; } /* Tighten vertical gap */
-  .center-suit-large { font-size: 1.1rem !important; } 
-
-  .corner-info { line-height: 0.9 !important; } 
-  .corner-info.top-left { top: 3px !important; left: 1px !important; } /* Maximize horizontal space */
-  .corner-info.bottom-right { bottom: 3px !important; right: 1px !important; }
-  
-  .completed-area { min-width: auto !important; flex-wrap: wrap; justify-content: center; gap: 4px !important; padding: 5px !important; }
-  .completed-slot { width: 25px !important; height: 35px !important; }
-  .stock-pile { width: 45px !important; height: 65px !important; font-size: 1rem !important; }
 }
 
 body {
@@ -65,23 +38,41 @@ body {
   box-sizing: border-box;
 }
 
+/* Header */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 24px;
+  padding: 10px 20px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  margin-bottom: 15px;
+  border-radius: 12px;
+  margin-bottom: 12px;
   backdrop-filter: blur(20px);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
   z-index: 10000;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.logo h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.header-center {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .stats-container {
   display: flex;
-  gap: 30px;
+  gap: 25px;
 }
 
 .stat-box {
@@ -90,37 +81,171 @@ header {
   align-items: center;
 }
 
-.stat-label { 
-  font-size: 0.75rem; 
-  color: rgba(255,255,255,0.7); 
-  text-transform: uppercase; 
-  letter-spacing: 1px; 
+.stat-label {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.stat-value { 
-  font-size: 1.4rem; 
-  font-weight: 800; 
-  color: #ffffff !important; 
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #ffffff !important;
   text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+/* 发牌区 */
+.stock-pile-top {
+  width: 45px;
+  height: 62px;
+  position: relative;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: all 0.2s ease;
 }
 
-.controls-group {
+.stock-card-front {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, #4a5568 0%, #2d3748 100%);
+  border-radius: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  z-index: 2;
 }
 
-.controls-group button {
-  padding: 4px 10px;
+.stock-card-decor {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.stock-count {
+  position: absolute;
+  bottom: 3px;
+  right: 5px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.stock-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 2px;
+  left: 2px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  z-index: 1;
+}
+
+/* 控制按钮组 */
+.controls-merged {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 6px 12px;
+  border-radius: 10px;
+}
+
+.controls-merged button {
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.controls-merged button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.controls-merged button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.controls-merged button svg {
+  flex-shrink: 0;
+}
+
+.controls-merged select {
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* 完成区 */
+.header-deck-area {
+  display: flex;
+  align-items: center;
+}
+
+.completed-area-top {
+  display: flex;
+  gap: 4px;
+}
+
+.completed-slot-top {
+  width: 28px;
+  height: 38px;
+  border: 2px dashed rgba(0, 217, 255, 0.3);
+  border-radius: 5px;
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.completed-slot-top:hover {
+  border-color: rgba(0, 217, 255, 0.6);
+  background: rgba(0, 217, 255, 0.08);
+}
+
+.card-face-mini {
+  width: 24px;
+  height: 34px;
+  border-radius: 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.empty-slot-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgba(0, 217, 255, 0.35);
   font-size: 0.8rem;
 }
 
+/* 牌桌 */
 .tableau {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
@@ -152,7 +277,6 @@ header {
 .column-placeholder:hover {
   background: rgba(0, 217, 255, 0.1);
   border-color: rgba(0, 217, 255, 0.4);
-  box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.15);
 }
 
 .column-placeholder:active {
@@ -160,7 +284,7 @@ header {
   transform: scale(0.97);
 }
 
-/* Base Card Container */
+/* 纸牌 */
 .card-container {
   width: var(--card-width);
   height: var(--card-height);
@@ -174,14 +298,7 @@ header {
   outline-offset: 2px;
   z-index: 15000 !important;
   border-radius: var(--card-radius);
-  transition: z-index 0s !important, outline 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 0 25px rgba(0, 217, 255, 0.6), 0 8px 25px rgba(0, 0, 0, 0.4) !important;
-}
-
-/* Hover effect for movable cards */
-.card-container:not(.selected):not(.dragging)[style*="cursor: grab"]:hover {
-  transform: translateY(-3px);
-  transition: transform 0.15s ease;
 }
 
 .card-container.invalid-move {
@@ -197,7 +314,6 @@ header {
   20%, 40%, 60%, 80% { transform: translateX(6px); }
 }
 
-/* Dragging State */
 .card-container.dragging {
   cursor: grabbing !important;
   transform: scale(1.08);
@@ -205,10 +321,6 @@ header {
   z-index: 16000 !important;
 }
 
-.card-container.dragging .card-inner {
-  transform: rotateY(0deg) !important;
-}
-/* Hint Highlighting */
 .card-container.hint-source {
   outline: 4px solid #f1c40f !important;
   box-shadow: 0 0 30px #f1c40f !important;
@@ -221,18 +333,8 @@ header {
   50% { transform: translateY(-12px); }
 }
 
-@keyframes hint-pulse {
-  0%, 100% { box-shadow: 0 0 20px #f1c40f, 0 0 40px rgba(241, 196, 15, 0.4); }
-  50% { box-shadow: 0 0 30px #f1c40f, 0 0 60px rgba(241, 196, 15, 0.6); }
-}
-
-.card-container.hint-source {
-  animation: hint-jump 0.5s ease-in-out infinite, hint-pulse 1s ease-in-out infinite;
-}
-
 .column.highlight-target {
   background: rgba(241, 196, 15, 0.15) !important;
-  box-shadow: inset 0 0 20px rgba(241, 196, 15, 0.3) !important;
 }
 
 .card-inner {
@@ -269,8 +371,6 @@ header {
   border: 2px solid rgba(255, 255, 255, 0.4);
   transform: rotateY(180deg);
   z-index: 1;
-  position: relative;
-  overflow: hidden;
 }
 
 .card-back::before {
@@ -279,13 +379,7 @@ header {
   inset: 4px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
-  background: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 3px,
-    rgba(255, 255, 255, 0.05) 3px,
-    rgba(255, 255, 255, 0.05) 6px
-  );
+  background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(255, 255, 255, 0.05) 3px, rgba(255, 255, 255, 0.05) 6px);
 }
 
 .card-back::after {
@@ -308,7 +402,6 @@ header {
   overflow: visible !important;
 }
 
-/* Corner Info */
 .corner-info {
   display: flex;
   flex-direction: column;
@@ -331,17 +424,16 @@ header {
   transform: rotate(180deg);
 }
 
-.rank-text { font-size: 1.3rem; font-weight: 900; }
-.suit-mini { font-size: 0.9rem; margin-top: 2px; }
+.rank-text { font-size: 1.2rem; font-weight: 900; }
+.suit-mini { font-size: 0.85rem; margin-top: 2px; }
 
-/* Minimalist Center Suit - SOLID COLOR */
 .center-suit-large {
   position: absolute;
   inset: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 5.5rem;
+  font-size: 5rem;
   opacity: 1;
   pointer-events: none;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
@@ -350,101 +442,47 @@ header {
 .red { color: #d63031 !important; }
 .black { color: #2d3436 !important; }
 
-/* Animations */
-.shake-anim {
-  animation: shake 0.3s ease-in-out;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-8px); }
-  50% { transform: translateX(8px); }
-  75% { transform: translateX(-8px); }
-}
-
-.bottom-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding: 10px 0;
-  z-index: 10000;
-}
-
-.completed-area {
-  display: flex;
-  gap: 10px;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 15px;
-  min-width: 380px;
-  backdrop-filter: blur(15px);
-  box-shadow: 0 0 30px rgba(0, 217, 255, 0.1);
-}
-
-.completed-slot {
-  width: 40px;
-  height: 55px;
-  border: 2px dashed rgba(255, 255, 255, 0.25);
-  border-radius: 8px;
-  position: relative;
-  background: rgba(255, 255, 255, 0.03);
-  transition: all 0.2s ease;
-}
-
-.completed-slot:hover {
-  border-color: rgba(0, 217, 255, 0.5);
-  background: rgba(0, 217, 255, 0.08);
-}
-
-.stock-pile {
-  width: var(--card-width);
-  height: var(--card-height);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: var(--card-radius);
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: white;
-  box-shadow: 5px 5px 0 rgba(0,0,0,0.3);
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.stock-pile::before {
-  content: '';
-  position: absolute;
-  inset: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
-}
-
-.stock-pile::before {
-  content: '';
-  position: absolute;
-  inset: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-}
-
-.stock-pile:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-  border-color: rgba(255, 255, 255, 0.5);
-}
-
-.stock-pile:active {
-  transform: translateY(0) scale(0.97);
-}
-
+/* 胜利弹窗 */
 .win-overlay {
   padding: 20px;
 }
+
+/* 移动端适配 */
 @media (max-width: 768px) {
-  .win-overlay h1 { font-size: 2.5rem !important; }
+  .game-container { padding: 10px 5px !important; }
+  header { padding: 8px 12px; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .logo h1 { font-size: 0.9rem !important; }
+  .header-center { gap: 8px; }
+  .stats-container { gap: 10px !important; }
+  .stat-label { font-size: 0.55rem !important; }
+  .stat-value { font-size: 0.9rem !important; }
+  
+  .controls-merged {
+    gap: 5px;
+    padding: 4px 8px;
+  }
+  .controls-merged button {
+    padding: 5px 8px;
+    font-size: 0.7rem;
+    border-radius: 5px;
+  }
+  .controls-merged button svg {
+    width: 14px;
+    height: 14px;
+  }
+  .controls-merged select {
+    padding: 5px 8px;
+    font-size: 0.7rem;
+  }
+  
+  .completed-slot-top { width: 22px !important; height: 30px !important; }
+  .card-face-mini { width: 18px !important; height: 26px !important; }
+  .stock-pile-top { width: 38px !important; height: 52px !important; }
+  
+  .rank-text { font-size: 0.7rem !important; }
+  .suit-mini { font-size: 0.45rem !important; }
+  .center-suit-large { font-size: 1rem !important; }
+  .corner-info.top-left { top: 2px !important; left: 1px !important; }
+  .corner-info.bottom-right { bottom: 2px !important; right: 1px !important; }
+  .win-overlay h1 { font-size: 2rem !important; }
 }

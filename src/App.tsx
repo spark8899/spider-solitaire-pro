@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RotateCcw, HelpCircle, Trophy, Play, Languages } from 'lucide-react';
+import { RotateCcw, HelpCircle, Trophy, Languages, RefreshCcw } from 'lucide-react';
 import './App.css';
 import type { Card, Move } from './logic/GameModel';
 import { translations } from './logic/translations';
@@ -65,10 +65,7 @@ const CardComponent: React.FC<{
       onDoubleClick={onDoubleClick}
       initial={animAction === 'deal' || animAction === 'init' ? { opacity: 0, x: 300, y: 300, rotate: 20 } : { opacity: 1 }}
       animate={{ 
-        opacity: 1, 
-        x: 0, 
-        y: 0,
-        rotate: 0,
+        opacity: 1, x: 0, y: 0, rotate: 0,
         top: cardIdx === 0 ? 0 : 'var(--card-overlap)',
         zIndex: isSelected ? 15000 + cardIdx : (animAction === 'deal' ? 5000 + cardIdx : cardIdx),
         transition: { 
@@ -128,20 +125,15 @@ const App: React.FC = () => {
   const [animAction, setAnimAction] = useState<'deal' | 'move' | 'init' | 'undo' | 'complete'>('init');
   const [dragTargetCol, setDragTargetCol] = useState<number | null>(null);
   const [invalidMove, setInvalidMove] = useState<boolean>(false);
-  const [lang, setLang] = useState<Language>(
-    navigator.language.startsWith('zh') ? 'zh' : 'en'
-  );
+  const [lang, setLang] = useState<Language>(navigator.language.startsWith('zh') ? 'zh' : 'en');
   
   const containerRef = useRef<HTMLDivElement>(null);
   const t = translations[lang];
 
-  // Timer Effect
   useEffect(() => {
     let interval: any;
     if (isTimerRunning && completedPiles.length < 8) {
-      interval = setInterval(() => {
-        setTime(prev => prev + 1);
-      }, 1000);
+      interval = setInterval(() => setTime(prev => prev + 1), 1000);
     }
     return () => clearInterval(interval);
   }, [isTimerRunning, completedPiles.length]);
@@ -154,11 +146,7 @@ const App: React.FC = () => {
 
   const saveToHistory = (cols: Card[][], stk: Card[], comp: Card[][], moves: number, currentTime: number) => {
     setHistory(prev => [...prev, JSON.parse(JSON.stringify({
-      columns: cols,
-      stock: stk,
-      completedPiles: comp,
-      moveCount: moves,
-      time: currentTime
+      columns: cols, stock: stk, completedPiles: comp, moveCount: moves, time: currentTime
     }))].slice(-50));
   };
 
@@ -179,9 +167,7 @@ const App: React.FC = () => {
     setInvalidMove(false);
   }, [difficulty]);
 
-  useEffect(() => {
-    initGame();
-  }, []);
+  useEffect(() => { initGame(); }, []);
 
   const toggleLang = () => setLang(prev => prev === 'zh' ? 'en' : 'zh');
 
@@ -227,15 +213,12 @@ const App: React.FC = () => {
     if (canPlaceOn(movingSequence[0], targetCard)) {
       saveToHistory(columns, stock, completedPiles, moveCount, time);
       if (!isTimerRunning) setIsTimerRunning(true);
-
       const newColumns = columns.map(c => [...c]);
       newColumns[fromColIdx] = columns[fromColIdx].slice(0, fromCardIdx);
       newColumns[toColIdx] = [...columns[toColIdx], ...movingSequence];
-
       if (newColumns[fromColIdx].length > 0) {
         newColumns[fromColIdx][newColumns[fromColIdx].length - 1].isFaceUp = true;
       }
-
       setAnimAction('move');
       setColumns(newColumns);
       setMoveCount(prev => prev + 1);
@@ -280,7 +263,6 @@ const App: React.FC = () => {
     }
     saveToHistory(columns, stock, completedPiles, moveCount, time);
     if (!isTimerRunning) setIsTimerRunning(true);
-
     setAnimAction('deal');
     const newColumns = columns.map(c => [...c]);
     const newStock = [...stock];
@@ -337,38 +319,81 @@ const App: React.FC = () => {
     setDragTargetCol(null);
   };
 
+  const handleNewGame = () => {
+    if (moveCount === 0 || window.confirm(lang === 'zh' ? '确定要开始新游戏吗？进度将丢失。' : 'Start new game? Current progress will be lost.')) {
+      initGame();
+    }
+  };
+
   return (
     <div className="game-container" ref={containerRef} onDoubleClick={() => setSelectedCards(null)}>
       <header>
-        <div className="logo"><h1 style={{ margin: 0, fontSize: '1.2rem', color: '#fff' }}>{t.title} <span style={{opacity: 0.5}}>{t.subtitle}</span></h1></div>
-        <div className="stats-container">
-          <div className="stat-box"><span className="stat-label">{t.moves}</span><span className="stat-value">{moveCount}</span></div>
-          <div className="stat-box"><span className="stat-label">{t.time}</span><span className="stat-value">{formatTime(time)}</span></div>
-          <div className="stat-box"><span className="stat-label">{t.stacks}</span><span className="stat-value">{completedPiles.length}/8</span></div>
+        <div className="logo">
+          <h1 style={{ margin: 0, fontSize: '1.2rem', color: '#fff' }}>
+            {t.title} <span style={{opacity: 0.5}}>{t.subtitle}</span>
+          </h1>
         </div>
-        <div className="controls">
-          <button onClick={handleUndo} disabled={history.length === 0} title={t.undo}><RotateCcw size={16} /></button>
-          <button onClick={handleHint} title={t.hint} style={{ background: 'rgba(255, 215, 0, 0.2)', color: '#ffd700' }}><HelpCircle size={16} /></button>
-          <select value={difficulty} onChange={(e) => initGame(Number(e.target.value) as any)} style={{ background: '#333', color: '#fff', border: 'none', padding: '8px', borderRadius: '4px', cursor: 'pointer' }}>
-            <option value={1}>{t.difficulty1}</option>
-            <option value={2}>{t.difficulty2}</option>
-            <option value={4}>{t.difficulty4}</option>
-          </select>
-          <div className="controls-group">
-            <button onClick={toggleLang} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+        
+        <div className="header-center">
+          <div className="stats-container">
+            <div className="stat-box">
+              <span className="stat-label">{t.moves}</span>
+              <span className="stat-value">{moveCount}</span>
+            </div>
+            <div className="stat-box">
+              <span className="stat-label">{t.time}</span>
+              <span className="stat-value">{formatTime(time)}</span>
+            </div>
+          </div>
+          
+          <motion.div whileHover={{ y: -5, scale: 1.05 }} whileTap={{ scale: 0.95 }}
+            className="stock-pile-top" onClick={handleDealStock}
+            style={{ visibility: stock.length > 0 ? 'visible' : 'hidden', cursor: stock.length > 0 ? 'pointer' : 'default' }}>
+            <div className="stock-card-front">
+              <div className="stock-card-decor">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.9">
+                  <rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7h18" /><circle cx="17" cy="13" r="1" fill="currentColor" />
+                </svg>
+              </div>
+              <span className="stock-count">{stock.length > 0 ? Math.ceil(stock.length / 10) : ''}</span>
+            </div>
+            <div className="stock-card-back"></div>
+          </motion.div>
+
+          <div className="controls-merged">
+            <button onClick={handleUndo} disabled={history.length === 0} title={t.undo}>
+              <RotateCcw size={16} />
+            </button>
+            <button onClick={handleHint} title={t.hint} style={{ background: 'rgba(255, 215, 0, 0.2)', color: '#ffd700' }}>
+              <HelpCircle size={16} />
+            </button>
+            <select value={difficulty} onChange={(e) => initGame(Number(e.target.value) as any)}>
+              <option value={1}>{t.difficulty1}</option>
+              <option value={2}>{t.difficulty2}</option>
+              <option value={4}>{t.difficulty4}</option>
+            </select>
+            <button onClick={toggleLang} title={t.langName}>
               <Languages size={14} /> {t.langName}
             </button>
-            <button 
-              onClick={() => {
-                if (moveCount === 0 || window.confirm(lang === 'zh' ? '确定要开始新游戏吗？进度将丢失。' : 'Start new game? Current progress will be lost.')) {
-                  initGame();
-                }
-              }} 
-              style={{ background: 'var(--accent-gold)', color: '#000' }} 
-              title={t.newGame}
-            >
-              <Play size={14} fill="currentColor" />
+            <button onClick={handleNewGame} title={t.newGame} style={{ background: 'linear-gradient(135deg, #e94560, #c73e54)', color: '#fff' }}>
+              <RefreshCcw size={14} />
             </button>
+          </div>
+        </div>
+        
+        <div className="header-deck-area">
+          <div className="completed-area-top">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="completed-slot-top">
+                {completedPiles[i]?.map((card) => (
+                  <motion.div key={card.id} layoutId={card.id} className="card-face-mini"
+                    style={{ background: 'linear-gradient(135deg, #667eea, #764ba2)', color: '#fff', fontSize: '0.65rem', fontWeight: 'bold' }}>
+                    {card.rank === 13 ? 'K' : ''}
+                  </motion.div>
+                ))}
+                {!completedPiles[i] && <div className="empty-slot-placeholder"><span>✓</span></div>}
+              </div>
+            ))}
           </div>
         </div>
       </header>
@@ -379,124 +404,60 @@ const App: React.FC = () => {
           
           const renderRecursiveCards = (cards: Card[], currentIdx: number): React.ReactNode => {
             if (currentIdx >= cards.length) return null;
-            
             const card = cards[currentIdx];
             const isSelected = selectedCards?.colIdx === colIdx && currentIdx >= selectedCards.cardIdx;
             const isHintSource = hint?.fromColIdx === colIdx && currentIdx === hint.fromCardIdx;
             const sequenceMovable = card.isFaceUp && canMoveSequence(cards.slice(currentIdx));
             
             return (
-              <CardComponent
-                key={card.id}
-                card={card}
-                cardIdx={currentIdx}
-                colIdx={colIdx}
-                isSelected={isSelected}
-                isHintSource={isHintSource}
-                isMovable={sequenceMovable}
-                isInvalid={isSelected && invalidMove}
-                animAction={animAction}
-                onDragStart={() => {
-                  setAnimAction('move');
-                  setSelectedCards({ colIdx, cardIdx: currentIdx });
-                }}
+              <CardComponent key={card.id} card={card} cardIdx={currentIdx} colIdx={colIdx}
+                isSelected={isSelected} isHintSource={isHintSource} isMovable={sequenceMovable}
+                isInvalid={isSelected && invalidMove} animAction={animAction}
+                onDragStart={() => { setAnimAction('move'); setSelectedCards({ colIdx, cardIdx: currentIdx }); }}
                 onDragEnd={(info) => onDragEnd(info, colIdx, currentIdx)}
                 onDrag={(info) => {
                   const tableauRect = containerRef.current?.getBoundingClientRect();
                   if (tableauRect) {
                     const dropX = info.point.x - tableauRect.left;
                     const toIdx = Math.floor(dropX / (tableauRect.width / 10));
-                    if (toIdx >= 0 && toIdx < 10) setDragTargetCol(toIdx);
-                    else setDragTargetCol(null);
+                    setDragTargetCol(toIdx >= 0 && toIdx < 10 ? toIdx : null);
                   }
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
                   setAnimAction('move');
-                  if (selectedCards) {
-                    tryMove(selectedCards.colIdx, selectedCards.cardIdx, colIdx);
-                  } else {
-                    if (sequenceMovable) setSelectedCards({ colIdx, cardIdx: currentIdx });
-                    else triggerInvalidFeedback();
-                  }
+                  if (selectedCards) tryMove(selectedCards.colIdx, selectedCards.cardIdx, colIdx);
+                  else { if (sequenceMovable) setSelectedCards({ colIdx, cardIdx: currentIdx }); else triggerInvalidFeedback(); }
                 }}
-                onDoubleClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedCards(null);
-                }}
-              >
+                onDoubleClick={(e) => { e.stopPropagation(); setSelectedCards(null); }}>
                 {renderRecursiveCards(cards, currentIdx + 1)}
               </CardComponent>
             );
           };
 
           return (
-            <div 
-              key={colIdx} 
-              className={`column ${dragTargetCol === colIdx || isHintTarget ? 'highlight-target' : ''}`}
-              style={{ zIndex: selectedCards?.colIdx === colIdx ? 20000 : 1 }}
-            >
-              <div 
-                className="column-placeholder"
-              onClick={() => {
-                if (selectedCards) tryMove(selectedCards.colIdx, selectedCards.cardIdx, colIdx);
-              }}
-              onDoubleClick={(e) => {
-                e.stopPropagation();
-                setSelectedCards(null);
-              }}
-            ></div>
-            <AnimatePresence initial={false}>
-              {renderRecursiveCards(column, 0)}
-            </AnimatePresence>
-          </div>
-        );
-      })}
-    </div>
-
-      <div className="bottom-bar">
-        <div className="completed-area">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="completed-slot">
-              {completedPiles[i]?.map((card) => (
-                <motion.div 
-                  key={card.id}
-                  layoutId={card.id}
-                  className="card-face" 
-                  style={{ 
-                    position: 'absolute', top: 0, left: 0, width: '35px', height: '50px', 
-                    background: 'white', border: '1px solid #ccc', borderRadius: '3px', 
-                    textAlign: 'center', lineHeight: '50px', fontWeight: 'bold',
-                    color: (card.suit === 'hearts' || card.suit === 'diamonds') ? '#d63031' : '#2d3436',
-                    zIndex: card.rank
-                  }}
-                >
-                  {card.rank === 13 ? 'K' : ''}
-                </motion.div>
-              ))}
+            <div key={colIdx} className={`column ${dragTargetCol === colIdx || isHintTarget ? 'highlight-target' : ''}`}
+              style={{ zIndex: selectedCards?.colIdx === colIdx ? 20000 : 1 }}>
+              <div className="column-placeholder" onClick={() => selectedCards && tryMove(selectedCards.colIdx, selectedCards.cardIdx, colIdx)}
+                onDoubleClick={(e) => { e.stopPropagation(); setSelectedCards(null); }}></div>
+              <AnimatePresence initial={false}>{renderRecursiveCards(column, 0)}</AnimatePresence>
             </div>
-          ))}
-        </div>
-        <motion.div whileHover={{ y: -5 }} whileTap={{ scale: 0.95 }} className="stock-pile" onClick={handleDealStock} style={{ visibility: stock.length > 0 ? 'visible' : 'hidden' }}>
-          {stock.length / 10}
-        </motion.div>
+          );
+        })}
       </div>
 
       <AnimatePresence>
         {completedPiles.length === 8 && (
           <div className="win-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 20000 }}>
-            <motion.div 
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              style={{ textAlign: 'center', color: '#fff', background: 'rgba(255,255,255,0.1)', padding: '40px 60px', borderRadius: '24px', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.2)' }}
-            >
+            <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+              style={{ textAlign: 'center', color: '#fff', background: 'rgba(255,255,255,0.1)', padding: '40px 60px', borderRadius: '24px', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.2)' }}>
               <Trophy size={100} color="var(--accent-gold)" style={{ marginBottom: '20px' }} />
               <h1 style={{ fontSize: '3.5rem', margin: '0 0 20px 0', fontWeight: 900 }}>{t.winTitle}</h1>
               <div style={{ fontSize: '1.2rem', marginBottom: '30px', display: 'flex', flexDirection: 'column', gap: '10px', opacity: 0.9 }}>
                 <p style={{ margin: 0 }}>{t.totalMoves}: <span style={{ color: 'var(--accent-gold)', fontWeight: 'bold' }}>{moveCount}</span></p>
                 <p style={{ margin: 0 }}>{t.totalTime}: <span style={{ color: 'var(--accent-gold)', fontWeight: 'bold' }}>{formatTime(time)}</span></p>
               </div>
-              <button onClick={() => initGame()} style={{ padding: '15px 50px', background: 'var(--accent-gold)', color: '#000', border: 'none', borderRadius: '12px', fontSize: '1.2rem', fontWeight: 'bold', cursor: 'pointer', transition: 'transform 0.2s' }}>
+              <button onClick={() => initGame()} style={{ padding: '15px 50px', background: 'var(--accent-gold)', color: '#000', border: 'none', borderRadius: '12px', fontSize: '1.2rem', fontWeight: 'bold', cursor: 'pointer' }}>
                 {t.playAgain}
               </button>
             </motion.div>
